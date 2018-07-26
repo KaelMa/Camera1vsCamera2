@@ -54,5 +54,8 @@
             -->
             <enum name="redEye" value="4"/>
         </attr>
+
+        <!-- 是否使用camera2 api -->
+        <attr name="isCamera2" format="boolean"></attr>
     </declare-styleable>
 </resources>
