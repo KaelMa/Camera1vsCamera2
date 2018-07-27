@@ -19,7 +19,9 @@ package com.google.android.cameraview.demo;
 import android.Manifest;
 import android.app.Dialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -271,6 +273,7 @@ public class Camera1Activity extends AppCompatActivity implements
                         if (os != null) {
                             try {
                                 os.close();
+                                galleryAddPic(path+name);
                             } catch (IOException e) {
                                 // Ignore
                             }
@@ -281,6 +284,14 @@ public class Camera1Activity extends AppCompatActivity implements
         }
 
     };
+
+    private void galleryAddPic(String path) {
+        Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+        File f = new File(path);
+        Uri contentUri = Uri.fromFile(f);
+        mediaScanIntent.setData(contentUri);
+        Camera1Activity.this.sendBroadcast(mediaScanIntent);
+    }
 
     public static class ConfirmationDialogFragment extends DialogFragment {
 
