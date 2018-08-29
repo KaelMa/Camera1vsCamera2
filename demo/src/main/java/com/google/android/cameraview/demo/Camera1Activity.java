@@ -109,7 +109,7 @@ public class Camera1Activity extends AppCompatActivity implements
                         getBackgroundHandler().post(new Runnable() {
                             @Override
                             public void run() {
-                                String path = "/sdcard/DCIM/Camera/Camera2预览原图-";
+                                String path = "/sdcard/DCIM/Camera/Camera1预览原图-";
                                 String name = UUID.randomUUID().toString().substring(0,5) + ".jpg";
                                 saveBitmap2PNG(bitmap,path + name);
                             }
