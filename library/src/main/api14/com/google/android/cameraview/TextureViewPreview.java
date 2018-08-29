@@ -18,8 +18,11 @@ package com.google.android.cameraview;
 
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.graphics.SurfaceTexture;
+import android.util.Log;
 import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
@@ -138,6 +141,10 @@ class TextureViewPreview extends PreviewImpl {
             matrix.postRotate(180, getWidth() / 2, getHeight() / 2);
         }
         mTextureView.setTransform(matrix);
+    }
+
+    public Bitmap getPreviewBitmap() {
+        return mTextureView.getBitmap();
     }
 
 }

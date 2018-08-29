@@ -21,6 +21,7 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -100,6 +101,19 @@ public class Camera2Activity extends AppCompatActivity implements
                 case R.id.take_picture:
                     if (mCameraView != null) {
                         mCameraView.takePicture();
+
+                        // get preview Bitmap
+                        final Bitmap bitmap = mCameraView.getPreviewBitmap();
+                        Log.d("myc", "get bitmap From Preview");
+
+                        getBackgroundHandler().post(new Runnable() {
+                            @Override
+                            public void run() {
+                                String path = "/sdcard/DCIM/Camera/Camera2预览原图-";
+                                String name = UUID.randomUUID().toString().substring(0,5) + ".jpg";
+                                saveBitmap2PNG(bitmap,path + name);
+                            }
+                        });
                     }
                     break;
             }
@@ -258,7 +272,7 @@ public class Camera2Activity extends AppCompatActivity implements
             getBackgroundHandler().post(new Runnable() {
                 @Override
                 public void run() {
-                    String path = "/sdcard/DCIM/Camera/Camera2-";
+                    String path = "/sdcard/DCIM/Camera/Camera2拍照原图-";
                     String name = UUID.randomUUID().toString().substring(0,5) + ".jpg";
 
                     File file = new File(path + name);
@@ -291,6 +305,34 @@ public class Camera2Activity extends AppCompatActivity implements
         Uri contentUri = Uri.fromFile(f);
         mediaScanIntent.setData(contentUri);
         Camera2Activity.this.sendBroadcast(mediaScanIntent);
+    }
+
+    public void saveBitmap2PNG(Bitmap bitmap, String path) {
+        FileOutputStream out = null;
+        try {
+            File file = new File(path);
+            File parent = file.getParentFile();
+            if (!parent.exists()) {
+                parent.mkdirs();
+            }
+            if (!file.exists()) {
+                file.createNewFile();
+            }
+            out = new FileOutputStream(path);
+            if (bitmap != null) {
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
+                out.flush();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                out.close();
+                galleryAddPic(path);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public static class ConfirmationDialogFragment extends DialogFragment {

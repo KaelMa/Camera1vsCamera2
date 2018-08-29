@@ -19,6 +19,7 @@ package com.google.android.cameraview;
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.graphics.Bitmap;
 import android.os.Build;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -78,6 +79,8 @@ public class CameraView extends FrameLayout {
 
     private final DisplayOrientationDetector mDisplayOrientationDetector;
 
+    private PreviewImpl mPreview;
+
     public CameraView(Context context) {
         this(context, null);
     }
@@ -95,7 +98,7 @@ public class CameraView extends FrameLayout {
             return;
         }
         // Internal setup
-        final PreviewImpl preview = createPreviewImpl(context);
+        mPreview = createPreviewImpl(context);
         mCallbacks = new CallbackBridge();
 
         // Attributes
@@ -103,10 +106,10 @@ public class CameraView extends FrameLayout {
                 R.style.Widget_CameraView);
         boolean isCamera2 = a.getBoolean(R.styleable.CameraView_isCamera2,false);
         if(!isCamera2) {
-            mImpl = new Camera1(mCallbacks, preview);
+            mImpl = new Camera1(mCallbacks, mPreview);
         }
         else {
-            mImpl = new Camera2(mCallbacks, preview, context);
+            mImpl = new Camera2(mCallbacks, mPreview, context);
         }
 
 
@@ -250,7 +253,8 @@ public class CameraView extends FrameLayout {
             //store the state ,and restore this state after fall back o Camera1
             Parcelable state=onSaveInstanceState();
             // Camera2 uses legacy hardware layer; fall back to Camera1
-            mImpl = new Camera1(mCallbacks, createPreviewImpl(getContext()));
+            mPreview = createPreviewImpl(getContext());
+            mImpl = new Camera1(mCallbacks, mPreview);
             onRestoreInstanceState(state);
             mImpl.start();
         }
@@ -408,6 +412,16 @@ public class CameraView extends FrameLayout {
      */
     public void takePicture() {
         mImpl.takePicture();
+    }
+
+    public Bitmap getPreviewBitmap() {
+        if (mPreview != null && mPreview instanceof TextureViewPreview) {
+            Bitmap bitmap = ((TextureViewPreview)mPreview).getPreviewBitmap();
+            return bitmap;
+        }
+        else {
+            return null;
+        }
     }
 
     private class CallbackBridge implements CameraViewImpl.Callback {
